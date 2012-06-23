@@ -1,5 +1,10 @@
 $(document).ready(function() {
-	$('.dialog').dialog({'autoOpen': false});
+	$('.dialog').dialog({
+		'autoOpen': false,
+		'modal':true,
+		'width':330,
+		'height':260
+	});
 	$('#upload_btn').click();
 	$('#webget_btn').click(function(){
 		$('#webget').dialog('open');
@@ -11,6 +16,10 @@ $(document).ready(function() {
 			$('#webget').dialog('close');
 		},'json');
 		return false;
+	});
+
+	$('#computer_btn').click(function(){
+		$('#fileupload').select();
 	});
 	
 	$('#fileupload').fileupload({

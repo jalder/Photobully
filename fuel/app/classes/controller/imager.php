@@ -16,7 +16,7 @@ class Controller_Imager extends Controller{
 		$this->user_id = $auth[1];
 		if(!$this->user_id){
 			//not logged in, do something about it
-			die('Not Logged In');
+			//die('Not Logged In');
 		}
 	}
 	

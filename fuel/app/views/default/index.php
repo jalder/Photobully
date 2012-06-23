@@ -8,6 +8,7 @@
 <script src="/assets/js/imager.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="/assets/css/bootstrap.css" />
+<link rel="stylesheet" href="/assets/css/jquery-ui.css" />
 
 </head>
 <body>
@@ -33,11 +34,13 @@
     		<div class="span2">
 	    		<form method="post" action="#">
 	    			<input type="hidden" name="upload" value="1" />
-	    			<input id="fileupload" type="file" name="files[]" class="btn" data-url="upload" value="Computer" multiple>
+				<div style="height: 45px; width:100px; background-image: url('/assets/img/computer.jpg'); background-repeat: no-repeat; overflow:hidden;cursor: hand;">
+	    				<input id="fileupload" type="file" name="files[]" class="" data-url="upload" value="Computer" style="width: 5000px; height: 45px; margin-left: -4000px;cursor:hand;" multiple>
+				</div>
 	    		</form>
     		</div>
     		<div class="span2">
-	    		<input type="button" class="btn" value="Web" id="webget_btn" />
+	    		<input type="button" class="btn-inverse btn-large" value="Web" id="webget_btn" />
     		</div>
     		<div class="span6">
     			<p>or drag and drop your images onto this page</p>
@@ -46,19 +49,19 @@
     	<div class="span1">
     	</div>
     	<div class="span4">
-    		<h2>View</h2>
+    		<h2>View images</h2>
     		
     		<?php foreach($images as $i):?>
-    			<a href="g/<?php echo $i->short_name; ?>"><img src="g/<?php echo $i->short_name; ?>" alt="<?php echo $i->original_name; ?>" style="width:100px" /></a>
+    			<a href="g/<?php echo $i->short_name; ?>"><img src="g/<?php echo $i->short_name; ?>" alt="<?php echo $i->original_name; ?>" style="width:80px" /></a>
     		<?php endforeach;?>
     	</div>
     </div>
     
-    <div class="dialog" id="webget">
-	    <h2>Upload from the web</h2>
-	    <form method="post" action="webget" id="webget_form">
-	    	<textarea name="webget" id="webget"></textarea> Enter URLs One Per Line
-	    	<input type="submit" value="Upload" />
+    <div class="dialog" id="webget" title="Upload from the web">
+	    <form method="post" action="webget" id="webget_form" class="well">
+		<span class="help-block">Enter the URLs of images, one per line:</span>
+	    	<textarea name="webget" id="webget" style="width: 250px; padding: 5px; height: 70px;"></textarea><br />
+	    	<input type="submit" value="Upload" class="btn btn-primary" />
 	    </form>
     </div>
 </div>

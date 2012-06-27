@@ -1,0 +1,19 @@
+.small_square{
+	width:70px; 
+	height: 70px; 
+	opacity: 0.5; 
+	background-color: black; 
+	margin: 2px;
+	display: inline-block;
+}
+.small_square:hover{
+	opacity:1.0;
+}
+
+.choose .active{
+	color: #b4d455;
+}
+
+.tags li input{
+	width: 100%;
+}

@@ -22,29 +22,164 @@ class Controller_Imager extends Controller{
 	
 	public function action_index(){
 		$view = View::forge($this->theme.'/index');
-		$view->images = Model_Image::find()->order_by('created_at','DESC')->limit(9)->get(); //get group of images for the recent View area
+		$view->header = View::forge($this->theme.'/includes/header',array('active'=>'dashboard'));
+		$view->footer = View::forge($this->theme.'/includes/footer');
+		$view->images = Model_Image::find()->order_by('created_at','DESC')->limit(16)->get(); //get group of images for the recent View area
+		$files = array();
+		foreach($view->images as $i){
+			$extension_pos = strrpos($i->short_name, '.');
+			$filename = substr($i->short_name, 0, $extension_pos).'_s'.substr($i->short_name, $extension_pos);
+			$files[$i->id] = $filename;
+		}
+		$view->files = $files;
+		$view->active = 'dashboard';
 		return $view->render();
 	}
 	
 	public function action_gallery(){
 		$view = View::forge($this->theme.'/gallery');
-		$images = Model_Image::find()->limit(20)->get();
+		$view->header = View::forge($this->theme.'/includes/header',array('active'=>'gallery'));
+		$view->footer = View::forge($this->theme.'/includes/footer');
+		$images = Model_Image::find()->order_by('created_at','DESC')->limit(64)->get();
 		$view->images = $images;
+		$files = array();
+		foreach($view->images as $i){
+			$extension_pos = strrpos($i->short_name, '.');
+			$filename = substr($i->short_name, 0, $extension_pos).'_b'.substr($i->short_name, $extension_pos);
+			$files[$i->id] = $filename;
+		}
+		$view->files = $files;	
+		$view->active = 'gallery';	
 		return $view;
 	}
 	
 	public function action_get(){
-		$id = self::alphaID($this->param('id'),true);
+		$id = 0;
+		if(strpos($this->param('id'),'_')){
+			$splode = explode('_',$this->param('id'));
+			
+			$id = Model_Image::alphaID($splode[0],true);
+		}
+		else{
+			$id = Model_Image::alphaID($this->param('id'),true);
+		}
 		$image = Model_Image::find($id);
-		$path = APPPATH.'files/'.$image->short_name;
-		$config = array();
-		$img = Image::load($path);
-		$img->output();
+		if($image){
+			$filename = $image->short_name;
+			if(isset($splode[1])){
+				$extension_pos = strrpos($filename, '.');
+				$filename = substr($filename, 0, $extension_pos).'_'.$splode[1].substr($filename, $extension_pos);
+			}
+			$path = APPPATH.'files/'.$filename;
+			$config = array();
+			try{
+				$img = Image::load($path);
+				$img->output();
+			}catch(Exception $e){
+				die('image not found');
+			}
+		}
 		die();
+		//return '';
+	}	
+	
+	public function action_download(){
+		$id = 0;
+		if(strpos($this->param('id'),'_')){
+			$splode = explode('_',$this->param('id'));
+			
+			$id = Model_Image::alphaID($splode[0],true);
+		}
+		else{
+			$id = Model_Image::alphaID($this->param('id'),true);
+		}
+		$image = Model_Image::find($id);
+		if($image){
+			$filename = $image->short_name;
+			if(isset($splode[1])){
+				$extension_pos = strrpos($filename, '.');
+				$filename = substr($filename, 0, $extension_pos).'_'.$splode[1].substr($filename, $extension_pos);
+			}
+			$path = APPPATH.'files/'.$filename;
+			$config = array();
+			try{
+				$img = File::download($path);
+				
+			}catch(Exception $e){
+				die('image not found');
+			}
+		}
+		die();		
+	}
+	
+	public function action_single(){
+		$id = Model_Image::alphaID($this->param('id'),true);
+		$image = Model_Image::find($id);
+		
+		if(!$image){
+			die('Image not found');
+		}
+		
+		$view = View::forge($this->theme.'/single');
+		$view->header = View::forge($this->theme.'/includes/header',array('active'=>'gallery'));
+		$view->footer = View::forge($this->theme.'/includes/footer');
+		$view->image = $image;
+		if($image->user_id){
+			$user = Model_User::find($image->user_id);
+			$view->username = $user->username;
+		}
+		else{
+			$view->username = 'Anon';
+		}
+		
+		if($image->user_id == $this->user_id){
+			$controls = View::forge($this->theme.'/includes/controls');
+			$controls->alphaID = $image->short_name;
+			$view->controls = $controls;
+		}
+		else{
+			$view->controls = '';
+		}
+		
+		//determine image size to display
+		$extension_pos = strrpos($image->short_name, '.');
+		switch(Input::get('s')){
+			case 's':
+				$filename = substr($image->short_name, 0, $extension_pos).'_s'.substr($image->short_name, $extension_pos);
+				$view->active = 's';
+				break;
+			case 'b':
+				$filename = substr($image->short_name, 0, $extension_pos).'_b'.substr($image->short_name, $extension_pos);
+				$view->active = 'b';
+				break;
+			case 'l':
+				$filename = substr($image->short_name, 0, $extension_pos).'_l'.substr($image->short_name, $extension_pos);
+				$view->active = 'l';
+				break;
+			case 'o':
+				$filename = $image->short_name;
+				$view->active = 'o';
+				break;
+			default:
+				$filename = substr($image->short_name, 0, $extension_pos).'_l'.substr($image->short_name, $extension_pos);
+				$view->active = 'l';
+				break;
+		}
+		
+		$view->filename = $filename;
+		
+		return $view;		
 	}
 	
 	public function action_upload(){
 		$message = array();
+		if(!$this->user_id){
+			$message = array(
+				'error'=>'Insufficient Permissions'
+			);
+			return $this->response->body(Format::forge($message)->to_json());
+		}
+		
 		$config = array(
 		    'path' => APPPATH.'files',
 		    'randomize' => true,
@@ -55,7 +190,7 @@ class Controller_Imager extends Controller{
 			Upload::process($config);
 			if(Upload::is_valid()){
 				$files = Upload::get_files();
-				var_dump($files);
+				//var_dump($files);
 				foreach($files as $f){
 					$prop = array(
 						'short_name'=>'',
@@ -77,6 +212,12 @@ class Controller_Imager extends Controller{
 	
 	public function action_webget(){
 		$message = array();
+		if(!$this->user_id){
+			$message = array(
+				'error'=>'Insufficient Permissions'
+			);
+			return $this->response->body(Format::forge($message)->to_json());
+		}
 		if(Input::post('webget')){
 			$webget = trim(Input::post('webget'));
 			$list = explode("\n",$webget);
@@ -117,6 +258,82 @@ class Controller_Imager extends Controller{
 		return $this->response->body(Format::forge($message)->to_json());
 	}
 	
+	private function alphaID_to_Image($alpha = ''){
+		
+		$id = 0;
+		if($alpha == ''){
+			$alpha = $this->param('id'); //need to replace rest of param with alpha below
+		}
+		if(strpos($this->param('id'),'_')){
+			$splode = explode('_',$this->param('id'));
+			
+			$id = Model_Image::alphaID($splode[0],true);
+		}
+		else{
+			$id = Model_Image::alphaID($this->param('id'),true);
+		}
+		$image = Model_Image::find($id);
+
+		
+		
+		return $image;
+	}
+	
+	public function action_update(){
+		$msg = array();
+		$image = self::alphaID_to_Image();
+		
+		if(Input::post('caption')&&$image){
+			if($image->user_id == $this->user_id){
+				$image->caption = Input::post('caption');		
+				if($image->save()){
+					$msg = array('success'=>'update was successful');
+				}
+				else{
+					$msg = array('error'=>'Error Saving Image');
+					return $msg;
+				}
+			}
+			else{
+				$msg = array('error'=>'Insufficient Permissions');
+				return $msg;
+			}
+			
+		}
+
+		return Format::forge($msg)->to_json();
+	}
+	
+	//delete an image from an alphaID POST
+	public function action_delete(){
+		$msg = array();
+		//$msg['error'] = '';
+		if($this->param('id')){
+			$image_id = Model_Image::alphaID($this->param('id'),true);
+			$image = Model_Image::find($image_id);
+			if($image){
+				if($image->user_id == $this->user_id){
+					if($image->delete()){
+						$msg['success'] = $image->id.' deleted';
+					}
+					else{
+						$msg['error'] = 'Error deleting '.$image->id;
+					}
+				}
+				else{
+					$msg['error'] = 'Insufficient Permissions on Object';
+				}
+			}
+			else{
+					$msg['error'] = 'Error finding '.$image_id;
+			}
+			
+		}
+		
+		return Format::forge($msg)->to_json();
+		
+	}
+	
 	private function validate_image($loc){
 		//Check Allowed Types
 		//Check Size
@@ -128,6 +345,8 @@ class Controller_Imager extends Controller{
 		$image->original_name = $prop['original_name'];
 		$image->user_id = $this->user_id;
 		$image->file_type = $prop['file_type'];
+		$image->caption = date('m/d/Y');
+		$image->location = 'http://img.jalder.com/g';
 		$image->save();
 		//var_dump($prop['file_type']);
 		//die();
@@ -138,99 +357,44 @@ class Controller_Imager extends Controller{
 			case 'image/png':
 				$ext = '.png';
 				break;
+			case 'image/gif':
+				$ext = '.gif';
+				break;
 			default:
 				$ext = '.jpeg';
 				break;
 		}
 		if(isset($prop['ext'])){
+			//disregard filetype switch, ext set manually
 			$ext = '.'.$prop['ext'];
 		}
-		$image->short_name = self::alphaID($image->get_id(),false).$ext;
+		$image->short_name = Model_Image::alphaID($image->get_id(),false).strtolower($ext);
 		if(rename($loc,APPPATH.'files/'.$image->short_name)){
 			$image->save();
+			$img = APPPATH.'files/'.$image->short_name;
+			$sizer = Image::forge()->load($img);
+			if($sizer->sizes()->width>640||$sizer->sizes()->height>480){
+				$large_thumb = $sizer->resize(640,480,true);
+				$large_thumb->save_pa('','_l');
+			}
+			else{
+				$large_thumb = $sizer;
+				$large_thumb->save_pa('','_l');
+			}
+			$big_square = $sizer->crop_resize(160,160);
+			$big_square->save_pa('','_b');
+			$small_square = $sizer->crop_resize(70,70);
+			$small_square->save_pa('','_s');
 		}
 		return $image->short_name;
 	}
 	
-	//alphaID function courtesy of 
-	//http://kevin.vanzonneveld.net/techblog/article/create_short_ids_with_php_like_youtube_or_tinyurl/
-	private function alphaID($in, $to_num = false, $pad_up = false, $passKey = null)
-	{
-	    $index = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	    if ($passKey !== null)
-	    {
-	        /* Although this function's purpose is to just make the
-	        * ID short - and not so much secure,
-	        * with this patch by Simon Franz (http://blog.snaky.org/)
-	        * you can optionally supply a password to make it harder
-	        * to calculate the corresponding numeric ID */
-	
-	        for ($n = 0; $n<strlen($index); $n++)
-	        {
-	            $i[] = substr( $index,$n ,1);
-	        }
-	
-	        $passhash = hash('sha256',$passKey);
-	
-	        $passhash = (strlen($passhash) < strlen($index)) ? hash('sha512',$passKey) : $passhash;
-	
-	        for ($n=0; $n < strlen($index); $n++)
-	        {
-	            $p[] =  substr($passhash, $n ,1);
-	        }
-	
-	        array_multisort($p,  SORT_DESC, $i);
-	        $index = implode($i);
-	    }
-	
-	    $base  = strlen($index);
-	
-	    if ($to_num)
-	    {
-	        // Digital number  <<--  alphabet letter code
-	        $in  = strrev($in);
-	        $out = 0;
-	        $len = strlen($in) - 1;
-	
-	        for ($t = 0; $t <= $len; $t++)
-	        {
-	            $bcpow = bcpow($base, $len - $t);
-	            $out   = $out + strpos($index, substr($in, $t, 1)) * $bcpow;
-	        }
-	
-	        if (is_numeric($pad_up))
-	        {
-	            $pad_up--;
-	            if ($pad_up > 0)
-	            {
-	                $out -= pow($base, $pad_up);
-	            }
-	        }
-	        $out = sprintf('%F', $out);
-	        $out = substr($out, 0, strpos($out, '.'));
-	    }
-	    else
-	    {
-	        // Digital number  -->>  alphabet letter code
-	        if (is_numeric($pad_up))
-	        {
-	            $pad_up--;
-	            if ($pad_up > 0)
-	            {
-	                $in += pow($base, $pad_up);
-	            }
-	        }
-	
-	        $out = "";
-	        for ($t = floor(log($in, $base)); $t >= 0; $t--)
-	        {
-	            $bcp = bcpow($base, $t);
-	            $a   = floor($in / $bcp) % $base;
-	            $out = $out . substr($index, $a, 1);
-	            $in  = $in - ($a * $bcp);
-	        }
-	        $out = strrev($out); // reverse
-	    }
-	    return $out;
+	public function action_documentation(){
+		$view = View::forge($this->theme.'/documentation');
+		$view->header = View::forge($this->theme.'/includes/header',array('active'=>'api'));
+		$view->footer = View::forge($this->theme.'/includes/footer');
+		return $view->render();		
+		
 	}
+	
 }

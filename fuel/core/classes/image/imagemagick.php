@@ -31,7 +31,7 @@ class Image_Imagemagick extends \Image_Driver
 		{
 			do
 			{
-				$this->image_temp = $this->config['temp_dir'].substr($this->config['temp_append'].md5(time() * microtime()), 0, 32).'.png';
+				$this->image_temp = $this->config['temp_dir'].substr($this->config['temp_append'].md5(time() * microtime()), 0, 32).'.'.$this->image_extension;
 			}
 			while (file_exists($this->image_temp));
 		}
@@ -49,7 +49,15 @@ class Image_Imagemagick extends \Image_Driver
 		{
 			throw new \RuntimeException("Could not write in the temp directory.");
 		}
-		$this->exec('convert', '"'.$image_fullpath.'"[0] "'.$this->image_temp.'"');
+		if($this->image_extension=='gif')
+		{
+			//$this->exec('convert', '"'.$image_fullpath.'" -coalesce "'.$this->image_temp.'"');
+			$this->exec('convert', '"'.$image_fullpath.'" "'.$this->image_temp.'"');
+		}
+		else
+		{
+			$this->exec('convert', '"'.$image_fullpath.'"[0] "'.$this->image_temp.'"');
+		}
 
 		return $this;
 	}

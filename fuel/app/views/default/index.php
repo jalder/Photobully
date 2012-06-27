@@ -1,34 +1,9 @@
-<html>
-<head>
-<title>imager: the open-source image sharer</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js" type="text/javascript"></script>
-<script src="/assets/js/jquery.iframe-transport.js"></script>
-<script src="/assets/js/jquery.fileupload.js"></script>
-<script src="/assets/js/imager.js" type="text/javascript"></script>
-
-<link rel="stylesheet" href="/assets/css/bootstrap.css" />
-<link rel="stylesheet" href="/assets/css/jquery-ui.css" />
-
-</head>
-<body>
-<div class="container">
-    <header>
-		<div class="navbar navbar-fixed-top">
-			<div class="navbar-inner">
-				<div class="container">
-					<a class="brand" href="/">imager</a>
-					<ul class="nav">
-						<li class="active"><a href="/" class="primary">dashboard</a></li>
-						<li class=""><a href="/gallery" class="success">browse</a></li>
-						<li class=""><a href="/logout" class="info">sign out</a></li>
-					</ul>					
-				</div>
-			</div>
-		</div>
-    </header>
-    <div style="height: 80px;"></div>
+<?php echo $header; ?>
+    <div style="margin: 0 auto; padding-bottom:20px; width: 300px;">
+    	<img src="http://jalder.com/assets/img/jl.jpg" alt="Jalder Labs" />
+    </div>
     <div class="container">
+    	<div class="span1">&nbsp;</div>
     	<div class="span5">
     		<h2>Upload images</h2>
     		<div class="span2">
@@ -42,19 +17,18 @@
     		<div class="span2">
 	    		<input type="button" class="btn-inverse btn-large" value="Web" id="webget_btn" />
     		</div>
-    		<div class="span6">
+    		<div class="span4">
     			<p>or drag and drop your images onto this page</p>
     		</div>
     	</div>
-    	<div class="span1">
-    	</div>
-    	<div class="span4">
-    		<h2>View images</h2>
-    		
+    	<div class="span5">
+    		<h2 style="width: 63%; display: inline-block;">View images</h2><a href="/gallery" class="btn btn-inverse" style="display: inline-block;">Browse</a>
+    	
     		<?php foreach($images as $i):?>
-    			<a href="g/<?php echo $i->short_name; ?>"><img src="g/<?php echo $i->short_name; ?>" alt="<?php echo $i->original_name; ?>" style="width:80px" /></a>
+    			<a href="v/<?php echo $i->short_name; ?>"><img src="<?php echo $i->location; ?>/<?php echo $files[$i->id]; ?>" alt="<?php echo $i->original_name; ?>" class="small_square" /></a>
     		<?php endforeach;?>
     	</div>
+    	<div class=""></div>
     </div>
     
     <div class="dialog" id="webget" title="Upload from the web">
@@ -64,6 +38,4 @@
 	    	<input type="submit" value="Upload" class="btn btn-primary" />
 	    </form>
     </div>
-</div>
-</body>
-</html>
+<?php echo $footer; ?>

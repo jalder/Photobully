@@ -11,7 +11,8 @@ class Model_Image extends \Orm\Model
 		'created_at',
 		'updated_at',
 		'caption',
-		'location'
+		'location',
+		'privacy'
 	);
 
 	protected static $_observers = array(

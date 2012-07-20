@@ -1,2 +1,3 @@
 fuel/app/config/*
 fuel/app/files
+fuel/app/tmp

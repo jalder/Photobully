@@ -22,7 +22,7 @@ photobully is a work in progress.  There is much to do.  This is evident with th
 	<h2>Methods</h2>
 	<ul>
 		<li>upload</li>
-		<li>webget</li>
+		<li>webload</li>
 		<li>get</li>
 		<li>send to cloud</li>
 		<li>update</li>

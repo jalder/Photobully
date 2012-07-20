@@ -8,7 +8,15 @@
 <script src="/assets/js/jquery.fileupload.js"></script>
 <script src="/assets/js/spinner.js"></script>
 <script src="/assets/js/imager.js" type="text/javascript"></script>
+<script type="text/javascript" src="/assets/js/jquery.mousewheel-3.0.6.pack.js"></script>
+<script type="text/javascript" src="/assets/fancybox/jquery.fancybox.pack.js?v=2.0.6"></script>
+<script type="text/javascript" src="/assets/fancybox/helpers/jquery.fancybox-buttons.js?v=1.0.2"></script>
+<script type="text/javascript" src="/assets/fancybox/helpers/jquery.fancybox-media.js?v=1.0.0"></script>
+<script type="text/javascript" src="/assets/fancybox/helpers/jquery.fancybox-thumbs.js?v=2.0.6"></script>
 
+<link rel="stylesheet" href="/assets/fancybox/jquery.fancybox.css?v=2.0.6" type="text/css" media="screen" />
+<link rel="stylesheet" href="/assets/fancybox/helpers/jquery.fancybox-buttons.css?v=1.0.2" type="text/css" media="screen" />
+<link rel="stylesheet" href="/assets/fancybox/helpers/jquery.fancybox-thumbs.css?v=2.0.6" type="text/css" media="screen" />
 <link rel="stylesheet" href="/assets/css/bootstrap.css" />
 <link rel="stylesheet" href="/assets/css/jquery-ui.css" />
 <link rel="stylesheet" href="/assets/css/imager.css" />

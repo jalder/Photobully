@@ -106,4 +106,21 @@ class Controller_Account extends Controller{
 		return $view;
 	}
 	
+	public function action_genkey(){
+		$msg = array();
+		
+		if($this->user_id){
+			$new_key = sha1(mt_rand(10000,99999).time().$this->user_id);
+			$user = Model_User::find($this->user_id);
+			$user->api_key = $new_key;
+			$user->save();
+			$msg['success'] = 'success';
+			$msg['api_key'] = $new_key;
+		}
+		else{
+			$msg['error'] = 'insufficient permissions';
+		}
+		return Format::forge($msg)->to_json();
+	}
+	
 }

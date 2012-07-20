@@ -6,7 +6,7 @@
 		<h2><?php echo $album->description; $image = ''; ?></h2>
 		<?php foreach($images as $i): ?>
 		<div>
-			<img src="/l/<?php echo $i->short_name; ?>" style="margin: 0 auto; display: block;" alt="<?php echo $i->original_name; ?>" />
+			<img src="<?php echo $i->location; ?>/<?php echo $i->short_name; ?>" style="margin: 0 auto; display: block;" alt="<?php echo $i->original_name; ?>" />
 		</div>
 		<?php $image = $i->short_name; endforeach; ?>
 		<p>Contributed at <?php echo date('H:i d/m/Y',$album->created_at); ?> by <?php echo $username; ?></p>

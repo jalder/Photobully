@@ -6,13 +6,13 @@
 		<div>
 			<a href="<?php echo $image->location; ?>/<?php echo $filename; ?>" target="_blank">
 			<?php if($image->location != ''){ ?>
-				<img src="<?php echo $image->location; ?>/<?php echo $filename; ?>" style="margin: 0 auto; display: block;" alt="<?php echo $image->original_name; ?>" />
+				<img src="<?php echo $image->location; ?>/<?php echo $filename; ?>" style="margin: 0 auto; display: block;" alt="<?php echo $image->original_name; ?>" class="single" />
 			<?php } else { ?>
-				<img src="<?php echo $image->location; ?>/<?php echo $filename; ?>" style="margin: 0 auto; display: block;" alt="<?php echo $image->original_name; ?>" />
+				<img src="<?php echo $image->location; ?>/<?php echo $filename; ?>" style="margin: 0 auto; display: block;" alt="<?php echo $image->original_name; ?>" class="single" />
 			<?php } ?>
 			</a>
 		</div>
-		<p>Contributed at <?php echo date('H:i d/m/Y',$image->created_at); ?> by <?php echo $username; ?></p>
+		<p>Contributed at <?php echo date('H:i d/m/Y',$image->created_at); ?> by <?php echo $username; ?> | Source: <?php echo $image->original_name; ?></p>
 	</div>
 
 	<div class="span4">

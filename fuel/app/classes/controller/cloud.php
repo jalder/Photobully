@@ -41,13 +41,13 @@ class Controller_Cloud extends Controller{
 				$rack->store_object($filename,'photobully');
 				$filename = substr($image->short_name, 0, $extension_pos).'_l'.substr($image->short_name, $extension_pos);
 				$rack->store_object($filename,'photobully');								
-				$msg .= 'iamhere';
+				$msg['success'] = 'success';
 				$image->save();
 			}
 			
 		}
 		
-		return $this->response->body($msg);
+		return $this->response->body(Format::forge($msg)->to_json());
 		
 	}
 	

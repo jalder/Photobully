@@ -667,6 +667,11 @@ abstract class Image_Driver
 		{
 			if ( ! $this->config['debug'])
 			{
+			//jalder edit, due to rfc standard, image/jpeg is the appropriate header to send!
+				if($filetype=='jpg')
+				{
+					$filetype = 'jpeg';
+				}
 				header('Content-Type: image/' . $filetype);
 			}
 			$this->new_extension = $filetype;

@@ -12,7 +12,8 @@ class Model_User extends \Orm\Model
 		'login_hash',
 		'profile_fields',
 		'created_at',
-		'updated_at'
+		'updated_at',
+		'api_key'
 	);
 
 	protected static $_observers = array(

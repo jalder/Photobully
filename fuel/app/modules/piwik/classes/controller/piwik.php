@@ -19,7 +19,7 @@ class Controller_Piwik{
 	public function __construct()
 	{
 		Config::load('piwik','piwik');
-		$this->url = 'http://stats.jalder.com/';
+		$this->url = Config::get('piwik.url');
 		$this->idSite = Config::get('piwik.site_id');
 		$this->token_auth = Config::get('piwik.token_auth');
 	}	

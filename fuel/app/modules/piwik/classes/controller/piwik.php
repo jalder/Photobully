@@ -16,7 +16,13 @@ class Controller_Piwik{
 	private $downloadUrl = '';
 	private $format = 'json';
 	
-	
+	public function __construct()
+	{
+		Config::load('piwik','piwik');
+		$this->url = 'http://stats.jalder.com/';
+		$this->idSite = Config::get('piwik.site_id');
+		$this->token_auth = Config::get('piwik.token_auth');
+	}	
 	
 	public function getDownload($downloadUrl){
 		

@@ -7,5 +7,3 @@
     RewriteRule ^(.*)$ index.php/$1 [L]
 </IfModule>
 
-#AddType image/x-icon .ico
-#RewriteRule ^favicon.ico /favicon.ico?v=2 [NC,L]

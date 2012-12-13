@@ -1,22 +1,19 @@
 <?php 
 
-//http://piwik.jalder.com/?module=API&idSite=11&period=week&date=2012-07-19&token_auth=e51970deb2dc7ae8f1c867fd03973b5e&downloadUrl=http://img.jalder.com/g/ns.jpeg&format=json&method=Actions.getDownload
-
-
 namespace Piwik; 
 
 class Controller_Piwik{
 	
-	public $idSite = 11;
+	public $idSite = 0;
 	
-	private $url = 'http://piwik.jalder.com/';
+	private $url = '';
 	
 	private $method = '';
 	
 	private $period = 'week';
 	private $date = '2012-07-19';
-	private $token_auth = 'e51970deb2dc7ae8f1c867fd03973b5e';
-	private $downloadUrl = 'http://img.jalder.com/g/ns.jpeg';
+	private $token_auth = '';
+	private $downloadUrl = '';
 	private $format = 'json';
 	
 	

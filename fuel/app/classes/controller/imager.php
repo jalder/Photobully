@@ -18,6 +18,7 @@ class Controller_Imager extends Controller{
 			//not logged in, do something about it
 			//die('Not Logged In');
 		}
+		Module::load('piwik');
 	}
 	
 	public function action_index(){
@@ -156,35 +157,35 @@ class Controller_Imager extends Controller{
 				$response = $this->response;
 				$img = Image::load($path);
 				
-				// Set image cache
+				//should do check here to see if allowed to see it
+
+				//if images are to be private, should we even attempt caching?
+
+				// Set cache headers
 				$response->set_header('Cache-Control', 'private, max-age=10800, pre-check=10800 ');
-				$response->set_header('Expires', date(DATE_RFC822,strtotime(" 2 day")));
+				$response->set_header('Expires', gmdate(DATE_RFC822,strtotime(" 2 day")));
 				$response->set_header('Pragma', 'private');
 				$response->set_header('Last-Modified',date(DATE_RFC822,filemtime($path)));
 				if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
-				   header('HTTP/1.1 304 Not Modified');
-				   die();
+					$time = strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']);
+				   //header('HTTP/1.1 304 Not Modified');
+				   //die();
 				}			
 				$response->send_headers();
 				
-				//piwik tracking
-				require_once APPPATH.'vendor/piwik/piwikTracker.php';
-				PiwikTracker::$URL = 'http://piwik.jalder.com/';
-				$piwikTracker = new PiwikTracker(11);
+				\Piwik\Controller_Piwiktracker::$URL = 'http://piwik.jalder.com/';
+				$piwikTracker = new \Piwik\Controller_Piwiktracker(11);
 				$piwikTracker->setTokenAuth('e51970deb2dc7ae8f1c867fd03973b5e');
-				//$piwikTracker->setIp(Input::ip());
 				$piwikTracker->doTrackAction($image->location.'/'.$image->short_name,'download');
-								
-				//are we sending the headers twice here?
-				$img->output();
 				
+				//are we sending redundant headers here?
+				$img->output();
 				
 			}catch(Exception $e){
 				die('image not found');
 			}
 		}
 		die();
-		//return '';
 	}	
 	
 	public function action_download(){
@@ -251,18 +252,11 @@ class Controller_Imager extends Controller{
 		else{
 			$view->active = 'l';
 		}
-		
-		//piwik tracking
-		//this is a sample call to get stats
-		//http://piwik.jalder.com/?module=API&idSite=11&period=week&date=2012-07-19&token_auth=e51970deb2dc7ae8f1c867fd03973b5e&downloadUrl=http://img.jalder.com/g/ns.jpeg&format=json&method=Actions.getDownload
-		
-		require_once APPPATH.'vendor/piwik/piwikTracker.php';
-		PiwikTracker::$URL = 'http://piwik.jalder.com/';
-		$piwikTracker = new PiwikTracker(11);
-		$piwikTracker->setTokenAuth('e51970deb2dc7ae8f1c867fd03973b5e');
 
-		$stats = $piwikTracker->getUrlTrackAction($image->location.'/'.$image->short_name,'download');
-		//var_dump($stats);
+		
+		$piwik = new \Piwik\Controller_Piwik();
+		$view->stats = $piwik->getDownload($image->location.'/'.$image->short_name);
+		
 		$view->filename = self::append_size($image->short_name,Input::get('s'));
 		
 		return $view;		
@@ -270,24 +264,16 @@ class Controller_Imager extends Controller{
 	
 	public function action_upload(){
 		$message = array();
-		if(!$this->user_id){
-			$message = array(
-				'error'=>'Insufficient Permissions'
-			);
-			return $this->response->body(Format::forge($message)->to_json());
-		}
-		
 		$config = array(
 		    'path' => APPPATH.'files',
 		    'randomize' => true,
 		    'ext_whitelist' => array('img', 'jpg', 'jpeg', 'gif', 'png'),
 		);
 		
-		if(Input::post('upload')){
+		if(Input::post('upload')&&$this->user_id){
 			Upload::process($config);
 			if(Upload::is_valid()){
 				$files = Upload::get_files();
-				//var_dump($files);
 				foreach($files as $f){
 					$prop = array(
 						'short_name'=>'',
@@ -302,20 +288,27 @@ class Controller_Imager extends Controller{
 					);
 					
 				}
+				if(count($files)>1){
+					$album = new Model_Album();
+					$album->name = date('Y-m-d');
+					//$album->user_id = $this->user_id;
+					$album->description = 'bulk upload image set';
+					$album->save();
+				}
 			}
+		}
+		else{
+			$message = array(
+				'error'=>'Insufficient Permissions and/or POST data'
+			);
 		}
 		return Format::forge($message)->to_json();
 	}
 	
 	public function action_webget(){
 		$message = array();
-		if(!$this->user_id){
-			$message = array(
-				'error'=>'Insufficient Permissions'
-			);
-			return Format::forge($message)->to_json();
-		}
-		if(Input::post('webget')){
+
+		if(Input::post('webget')&&$this->user_id){
 			$webget = trim(Input::post('webget'));
 			$list = explode("\n",$webget);
 			foreach($list as $url){
@@ -323,7 +316,7 @@ class Controller_Imager extends Controller{
 				//Validate Image URL 
 				$imagesize = getimagesize($url);
 				if(is_array($imagesize)){
-					//var_dump($imagesize);
+
 					//Get Image
 					$prop = array();
 					$ch = curl_init($url);
@@ -337,8 +330,10 @@ class Controller_Imager extends Controller{
 					
 					$prop['original_name'] = $url;
 					$prop['file_type'] = $imagesize['mime'];
+					
 					//Validate Image
 					self::validate_image($tmp);
+					
 					//Store Image
 					if($short_name = self::store_image($tmp, $prop)){
 						$message[] = array(
@@ -346,10 +341,16 @@ class Controller_Imager extends Controller{
 							'original_name'=>$prop['original_name']
 						);
 					}
+					
 					//Add Meta/Group Details to File Object to Image Model
 					//Append JSON message
 				}
 			}
+		}
+		else{
+			$message = array(
+				'error'=>'Insufficient Permissions'
+			);
 		}
 		return Format::forge($message)->to_json();
 	}
@@ -469,7 +470,6 @@ class Controller_Imager extends Controller{
 	//delete an image from an alphaID POST
 	public function action_delete(){
 		$msg = array();
-		//$msg['error'] = '';
 		if($this->param('id')){
 			$image_id = Model_Image::alphaID($this->param('id'),true);
 			$image = Model_Image::find($image_id);
@@ -491,9 +491,11 @@ class Controller_Imager extends Controller{
 			}
 			
 		}
+		else{
+			$msg['error'] = 'Not Logged In';
+		}
 		
 		return Format::forge($msg)->to_json();
-		
 	}
 	
 	private function validate_image($loc){
@@ -511,8 +513,7 @@ class Controller_Imager extends Controller{
 		$image->location = 'http://img.jalder.com/g';
 		$image->privacy = 0;
 		$image->save();
-		//var_dump($prop['file_type']);
-		//die();
+
 		switch($prop['file_type']){
 			case 'image/jpeg':
 				$ext = '.jpeg';
@@ -556,8 +557,15 @@ class Controller_Imager extends Controller{
 		$view = View::forge($this->theme.'/documentation');
 		$view->header = View::forge($this->theme.'/includes/header',array('active'=>'api'));
 		$view->footer = View::forge($this->theme.'/includes/footer');
-		return $view->render();		
-		
+		return $view;
+	}
+	
+	
+	public function action_404(){
+		$view = View::forge($this->theme.'/errors/404');
+		$view->header = View::forge($this->theme.'/includes/header',array('active'=>'api'));
+		$view->footer = View::forge($this->theme.'/includes/footer');
+		return Response::forge($view, 404);		
 	}
 	
 }

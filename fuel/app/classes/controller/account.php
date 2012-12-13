@@ -24,21 +24,19 @@ class Controller_Account extends Controller{
 			}
 		}
 		else{
-			//die('could not log in.');
-			$view = View::forge('default/includes/login.form');
+			$view = View::forge('default/login');
 			$view->header = View::forge('default/includes/header',array('active'=>'login'));
 			$view->footer = View::forge('default/includes/footer');
 			$view->active = 'login';
+			$view->login_form = View::forge('default/includes/login.form');
 			return $view;
 		}
-		
-		
 	}
 	
 	public function action_logout(){
 		$auth = Auth::instance();
 		$auth->logout();
-		Response::redirect('/account/login');
+		Response::redirect('/');
 		
 	}
 	

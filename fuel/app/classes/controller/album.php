@@ -9,10 +9,8 @@ class Controller_Album extends Controller{
 	private $user_id = 0;
 	
 	public function before(){
-		
 		$user = Auth::get_user_id();
 		$this->user_id = $user[1];
-		
 	}
 	
 	public function action_index(){
@@ -20,7 +18,6 @@ class Controller_Album extends Controller{
 		
 		$album = Model_Album::find($id);
 		if($album){
-			
 			$view = View::forge($this->theme.'/album');
 			$view->header = View::forge($this->theme.'/includes/header',array('active'=>'gallery'));
 			$view->footer = View::forge($this->theme.'/includes/footer');
@@ -29,9 +26,10 @@ class Controller_Album extends Controller{
 			$view->images = $album->images;
 
 			return $view;
+		}
+		else{
 			
 		}
-		
 	}
 	
 	public function action_gallery(){
@@ -39,10 +37,8 @@ class Controller_Album extends Controller{
 		$view = View::forge($this->theme.'/gallery');
 		$album = Model_Album::find($id);
 		if($album){		
-			
 			$view->header = View::forge($this->theme.'/includes/header',array('active'=>'gallery'));
 			$view->footer = View::forge($this->theme.'/includes/footer');
-			//$images = Model_Image::find()->where('privacy', '<', 1)->order_by('created_at','DESC')->limit(64)->get();
 			$view->images = $album->images;
 			$view->albums = '';
 			$files = array();
@@ -99,6 +95,7 @@ class Controller_Album extends Controller{
 		
 		return $filename;
 	}	
+	
 	public function action_create(){
 		$msg = array();
 		if($this->user_id && Input::post('album_name')){
@@ -107,8 +104,7 @@ class Controller_Album extends Controller{
 			$album->user_id = $this->user_id;
 			$album->description = Input::post('album_description');
 			$album->save();
-			
-			
+						
 			$msg[] = array(
 				'id' => $album->id,
 				'name' => $album->name
@@ -144,6 +140,20 @@ class Controller_Album extends Controller{
 		}
 		else{
 			$msg['error'] = 'Insufficient Permissions and/or POST data.';
+		}
+		return Format::forge($msg)->to_json();
+	}
+	
+	public function action_remove(){
+		$msg = array();
+		if($album_id=$this->param('id')){
+			//or album_id from post?
+			$album = Model_Album::find($album_id);
+			if($image_id = (int)Input::post('image_id')){
+				unset($album->images[$image_id]);
+				$album->save();
+				$msg['success'] = 'success';
+			}
 		}
 		return Format::forge($msg)->to_json();
 	}

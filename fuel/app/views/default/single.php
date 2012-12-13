@@ -27,6 +27,9 @@
 			<li>Markdown Link<br /><input type="text" readonly="readonly" value="[Image Link](http://img.jalder.com/v/<?php echo $image->short_name; ?>)"/></li>
 		</ul>
 		<p class="choose"><strong>Sizes</strong> <a href="?s=o" <?php echo ($active=='o')?'class="active"':''; ?>>Original</a> &bull; <a href="?s=s" <?php echo ($active=='s')?'class="active"':''; ?>>Small Square</a> &bull; <a href="?s=l" <?php echo ($active=='l')?'class="active"':''; ?>>Large Thumbnail</a></p>
+		<?php if(is_object($stats)){ ?>
+			<p class="stats">Total Views: <?php echo $stats->nb_hits; ?> | Unique Views: <?php echo $stats->nb_visits; ?></p>
+		<?php }?>
 	</div>
 </div>
 

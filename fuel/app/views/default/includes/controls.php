@@ -14,7 +14,7 @@
 	<li><a href="#" id="rotate_left">Rotate Left</a></li>
 	<li><a href="#" id="rotate_right">Rotate Right</a></li>
 	<li><a href="#" id="edit_crop">Crop</a></li>
-	<li><a href="/s/<?php echo $alphaID; ?>" target="_blank" id="download">Download Original</a></li>
+	<li><a href="/s/<?php echo $alphaID; ?>" target="_blank" id="download">Download</a></li>
 	<li><a href="#" id="delete_image">Delete</a></li>
 </ul>
 <script type="text/javascript">
@@ -108,6 +108,28 @@ $(document).ready(function(){
 			},'json');
 		}
 	});
+
+	$('#caption').click(function(){
+		var current = $('#caption').html();
+		$('#caption').html('<input type="text" value="'+current+'" name="caption" id="input_caption" class="xlarge" />');
+                $('#input_caption').focus();
+                $('#edit_caption').html('Save Caption');
+	});
+	$('#caption #input_caption').live('blur',function(){
+		                        var new_caption = $('#input_caption').val();
+                        //do post, if success
+                        $.post('/u/<?php echo $alphaID; ?>',{'caption':new_caption},function(data){
+                                console.log(data);
+                                if(data.success){
+                                        $('#caption').html(new_caption);
+                                        $('#edit_caption').html('Edit Caption');
+                                }
+                                else{
+                                        console.log(data);
+                                }
+                        },'json');
+	});
+
 	$('.single').unwrap();
 
 	var image = $('.single');

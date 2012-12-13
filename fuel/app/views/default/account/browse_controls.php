@@ -6,20 +6,20 @@
 
 </ul>
 <h2>Tools</h2>
-<ul>
-	<li>Albums</li>
+<ul id="tool_link">
+	<li ref="albums">Albums</li>
 </ul>
 
 <div id="albums" class="tool">
 	<h3>Albums</h3>
 	<a href="#" id="" class="dialog_open" rel="create_album">Create</a>
-	<select name="album" id="album_select">
+	<select name="album" id="album_select" class="span2">
 		<option value="#">&nbsp;</option>
 		<?php foreach($albums as $a): ?>
 		<option value="<?php echo $a->id; ?>"><?php echo $a->name; ?></option>
 		<?php endforeach; ?>
 	</select>
-	<div id="drop_area" class="dropzone" style="height: 400px; width:210px; border: 1px dashed black;">
+	<div id="drop_area" class="dropzone span2" style="height: 400px; margin-left: 2px; border: 1px dashed black;">
 	
 	</div>
 </div>
@@ -34,6 +34,13 @@
 
 <script type="text/javascript">
 $(document).ready(function(){
+	$('.tool').hide();
+	$('#tool_link li').click(function(){
+		var tool = $(this).attr('ref');
+		$('.tool').slideUp();
+		$('#'+tool).slideDown();
+	});
+	
 	$('#public_list').click(function(){
 		$.get('/imager/list',{'type':''},function(data){
 			if(data){

@@ -5,11 +5,12 @@
     <div class="container">
     	<div class="span1">&nbsp;</div>
     	<div class="span5">
+	<?php if(Auth::check()): ?>
     		<h2>Upload images</h2>
     		<div class="span2">
 	    		<form method="post" action="#">
 	    			<input type="hidden" name="upload" value="1" />
-				<div style="height: 45px; width:100px; background-image: url('/assets/img/computer.jpg'); background-repeat: no-repeat; overflow:hidden;cursor: hand;">
+				<div class="" style="height: 45px; width:100px; background-image: url('/assets/img/computer.jpg'); background-repeat: no-repeat; overflow:hidden;cursor: hand;">
 	    				<input id="fileupload" type="file" name="files[]" class="" data-url="upload" value="Computer" style="width: 5000px; height: 45px; margin-left: -4000px;cursor:hand;" multiple>
 				</div>
 	    		</form>
@@ -20,6 +21,10 @@
     		<div class="span4">
     			<p>or drag and drop your images onto this page</p>
     		</div>
+	<?php else: ?>
+		<h2>Login</h2>
+		<?php echo View::forge('default/includes/login.form')->render();  ?>
+	<?php endif; ?>
     	</div>
     	<div class="span5">
     		<h2 style="width: 63%; display: inline-block;">View images</h2><a href="/gallery" class="btn btn-inverse" style="display: inline-block;">Browse</a>

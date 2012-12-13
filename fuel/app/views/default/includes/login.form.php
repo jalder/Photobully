@@ -1,4 +1,3 @@
-<?php echo $header; ?>
 
 <form method="post" action="/account/login">
 <label>Username: </label><input type="text" name="username" id="username" value="" />
@@ -14,4 +13,3 @@ $(document).ready(function(){
 
 </script>
 
-<?php echo $footer; ?>

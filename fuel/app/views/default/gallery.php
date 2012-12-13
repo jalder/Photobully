@@ -1,8 +1,11 @@
 <?php echo $header; ?>
 <div class="container">
 	<div class="row">
-		Filters: Sort By<select class="input-small"><option>Newest</option></select>
-	
+		<div class="well span12">
+			&nbsp;
+		
+		
+		</div>
 	</div>
 	<div class="span9" style="margin-left: 0px;" id="list">
 		<?php foreach($images as $i): ?>
@@ -13,8 +16,12 @@
 		<?php endforeach;?>
 	</div>
 	<div class="span3">
+		<div class="well">
 		<?php echo $sidebar; ?>
+		</div>
+		<?php include('account/trash_can.php'); ?>
 	</div>
+
 </div>
 
 

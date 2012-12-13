@@ -31,8 +31,6 @@ class Controller_Rackspace extends Controller{
 	
 	public function action_index(){
 		
-		self::store_object('Zq.jpeg','photobully');
-		die();
 	}
 	
 	public function create_container($name){
@@ -52,11 +50,8 @@ class Controller_Rackspace extends Controller{
 		
 		$object->write(File::read(APPPATH.'files/'.$file,true),File::get_size(APPPATH.'files/'.$file));
 		$url = $con->make_public();
-		//var_dump($url);
-		//var_dump($object->public_uri());
-		//echo '<img src="'.$object->public_uri().'" alt="" />';
+
 		return $url;
-		//die();
 	}
 	
 	public function get_containers(){

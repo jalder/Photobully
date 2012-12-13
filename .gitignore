@@ -2,3 +2,8 @@ fuel/app/config/*
 fuel/app/files
 fuel/app/tmp
 fuel/app/logs
+.settings
+oil
+.project
+Index.screen
+.buildpath

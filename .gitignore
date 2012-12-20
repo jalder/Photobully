@@ -8,3 +8,4 @@ oil
 Index.screen
 .buildpath
 fuel/app/cache
+fuel/app/modules/*/config

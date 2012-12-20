@@ -15,9 +15,9 @@ class Controller_Imager extends Controller{
 		$auth = Auth::get_user_id();
 		$this->user_id = $auth[1];
 		if(!$this->user_id){
-			//not logged in, do something about it
-			//die('Not Logged In');
+			//user not logged in
 		}
+		Config::load('piwik','piwik');
 		Module::load('piwik');
 	}
 	
@@ -75,14 +75,11 @@ class Controller_Imager extends Controller{
 	}
 	
 	public function action_rotate(){
-		$msg = array();
-		
+		$msg = array();		
 		$image = self::alphaID_to_Image();
 		$degrees = Input::post('degrees');
-		//return APPPATH.'files/'.$image->short_name;
 		$img = Image::load(APPPATH.'files/'.$image->short_name.'')->rotate((int)$degrees);
-		//var_dump($img);
-		//die();
+
 		if($img->save(APPPATH.'files/'.$image->short_name)){
 			self::save_thumbs($img);
 			$msg['success'] = 'success';
@@ -173,9 +170,9 @@ class Controller_Imager extends Controller{
 				}			
 				$response->send_headers();
 				
-				\Piwik\Controller_Piwiktracker::$URL = 'http://piwik.jalder.com/';
-				$piwikTracker = new \Piwik\Controller_Piwiktracker(11);
-				$piwikTracker->setTokenAuth('e51970deb2dc7ae8f1c867fd03973b5e');
+				\Piwik\Controller_Piwiktracker::$URL = Config::get('piwik.url');
+				$piwikTracker = new \Piwik\Controller_Piwiktracker((int)Config::get('piwik.site_id'));
+				$piwikTracker->setTokenAuth(Config::get('piwik.token_auth'));
 				$piwikTracker->doTrackAction($image->location.'/'.$image->short_name,'download');
 				
 				//are we sending redundant headers here?
@@ -342,7 +339,7 @@ class Controller_Imager extends Controller{
 						);
 					}
 					
-					//Add Meta/Group Details to File Object to Image Model
+					//Add Meta/Group Details
 					//Append JSON message
 				}
 			}
@@ -529,7 +526,7 @@ class Controller_Imager extends Controller{
 				break;
 		}
 		if(isset($prop['ext'])){
-			//disregard filetype switch, ext set manually
+			//disregard filetype switch above, extension set manually
 			$ext = '.'.$prop['ext'];
 		}
 		$image->short_name = Model_Image::alphaID($image->get_id(),false).strtolower($ext);

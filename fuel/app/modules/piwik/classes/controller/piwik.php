@@ -1,8 +1,15 @@
 <?php 
+/**
+ * Piwik Module for getting relevant document statistics 
+ * 
+ * @author John Alder http://jalder.com
+ *
+ */
+
 
 namespace Piwik; 
 
-class Controller_Piwik{
+class Controller_Piwik extends \Controller{
 	
 	public $idSite = 0;
 	
@@ -18,16 +25,16 @@ class Controller_Piwik{
 	
 	public function __construct()
 	{
-		Config::load('piwik','piwik');
-		$this->url = Config::get('piwik.url');
-		$this->idSite = Config::get('piwik.site_id');
-		$this->token_auth = Config::get('piwik.token_auth');
+		\Config::load('piwik::piwik','piwik');
+		$this->url = \Config::get('piwik.url');
+		$this->idSite = \Config::get('piwik.site_id');
+		$this->token_auth = \Config::get('piwik.token_auth');
 	}	
 	
 	public function getDownload($downloadUrl){
 		
 		$this->method = 'Actions.getDownload';
-		$this->downloadUrl = $downloadUrl;
+		$this->downloadUrl = urlencode($downloadUrl);
 		
 		$query = $this->url.'?module=API';
 		$query .= '&idSite='.$this->idSite;

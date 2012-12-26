@@ -150,6 +150,15 @@ class Controller_Imager extends Controller{
 			}
 			$path = APPPATH.'files/'.$filename;
 			$config = array();
+			if($image->privacy==2){
+				$auth = Auth::instance()->get_user_id();
+				if($auth[1]==$image->user_id){
+
+				}
+				else{
+					die('this image is private');
+				}
+			}
 			try{
 				$response = $this->response;
 				$img = Image::load($path);

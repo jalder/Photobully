@@ -7,6 +7,7 @@
 ?>
 <input type="radio" name="privacy" value="0" <?php if($privacy == 0){ ?>checked="checked"<?php }?> /> Public<br />
 <input type="radio" name="privacy" value="1" <?php if($privacy == 1){ ?>checked="checked"<?php }?> /> Unlisted<br />
+<input type="radio" name="privacy" value="2" <?php if($privacy == 2){ ?>checked="checked"<?php }?> /> Private <br />
 <ul id="controls">
 	<li><a href="#" id="duplicate" rel="http://img.jalder.com/s/<?php echo $alphaID; ?>">Duplicate</a></li>
 	<li><a href="#" id="send_to_cloud">Send to Cloud</a></li>

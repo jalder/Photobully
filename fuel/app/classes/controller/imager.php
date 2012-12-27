@@ -15,7 +15,15 @@ class Controller_Imager extends Controller{
 		$auth = Auth::get_user_id();
 		$this->user_id = $auth[1];
 		if(!$this->user_id){
-			//user not logged in
+			//user not logged in check for API key
+			if(Input::post('api_key')){
+				$user = Model_User::find()->where('api_key',Input::post('api_key'))->where('username',Input::post('username'))->get_one();
+				//echo $user->getUsername();
+				if($user){
+					$auth = Auth::instance()->force_login($user->id);
+					$this->user_id = $user->id;
+				}
+			}
 		}
 		Config::load('piwik','piwik');
 		Module::load('piwik');
@@ -288,7 +296,7 @@ class Controller_Imager extends Controller{
 						'ext'=>$f['extension']
 					);
 					$short_name = self::store_image($f['file'],$prop);
-					$message[] = array(
+					$message['file'] = array(
 						'short_name'=>$short_name,
 						'original_name'=>$f['name']
 					);
@@ -393,7 +401,7 @@ class Controller_Imager extends Controller{
 				}
 			}
 			else{
-				$msg = array('error'=>'Insufficient Permissions');
+				$msg = array('error'=>'Caption: Insufficient Permissions');
 			}
 			
 		}
@@ -409,7 +417,7 @@ class Controller_Imager extends Controller{
 				}
 			}
 			else{
-				$msg = array('error'=>'Insufficient Permissions');
+				$msg = array('error'=>'Privacy: Insufficient Permissions');
 			}			
 		}
 

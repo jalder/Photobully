@@ -43,6 +43,9 @@ class Controller_Album extends Controller{
 			$view->albums = '';
 			$files = array();
 			$lightbox = array();
+			
+			$view->public_albums = Model_Album::public_albums();
+			
 			foreach($view->images as $i){
 				$extension_pos = strrpos($i->short_name, '.');
 				$filename = substr($i->short_name, 0, $extension_pos).'_b'.substr($i->short_name, $extension_pos);

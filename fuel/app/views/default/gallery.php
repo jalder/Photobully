@@ -19,7 +19,15 @@
 		<div class="well">
 		<?php echo $sidebar; ?>
 		</div>
-		<?php include('account/trash_can.php'); ?>
+		<?php //include('account/trash_can.php'); ?>
+		<div class="well">
+			<h3>Public Albums</h3>
+			<ul>
+				<?php foreach($public_albums as $a): ?>
+					<li><a href="/a/<?php echo $a->id; ?>"><?php echo $a->name; ?></a></li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
 	</div>
 
 </div>

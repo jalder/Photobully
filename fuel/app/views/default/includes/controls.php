@@ -18,6 +18,12 @@
 	<li><a href="/s/<?php echo $alphaID; ?>" target="_blank" id="download">Download</a></li>
 	<li><a href="#" id="delete_image">Delete</a></li>
 </ul>
+<h3>Exif</h3>
+<ul>
+	<?php foreach($exif as $k=>$e):?>
+		<li><?php echo $k; ?> : <?php echo $e; ?></li>
+	<?php endforeach; ?>
+</ul>
 <script type="text/javascript">
 
 $(document).ready(function(){

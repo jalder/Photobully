@@ -27,6 +27,7 @@ class Controller_Imager extends Controller{
 		}
 		Config::load('piwik','piwik');
 		Module::load('piwik');
+		Config::load('imager','imager');
 	}
 	
 	public function action_index(){
@@ -52,6 +53,9 @@ class Controller_Imager extends Controller{
 		$images = Model_Image::find()->where('privacy', '<', 1)->order_by('created_at','DESC')->limit(64)->get();
 		$view->images = $images;
 		$view->albums = self::get_albums();
+		
+		$view->public_albums = Model_Album::public_albums();
+		
 		$files = array();
 		$lightbox = array();
 		foreach($view->images as $i){
@@ -255,6 +259,19 @@ class Controller_Imager extends Controller{
 			$controls = View::forge($this->theme.'/includes/controls');
 			$controls->alphaID = $image->short_name;
 			$controls->privacy = $image->privacy;
+			if($image->file_type=="image/jpeg"||$image->file_type=="image/jpg"||$image->file_type=="image/tiff"){
+				$raw_exif = exif_read_data(APPPATH.'files/'.$image->short_name);
+				foreach($raw_exif as $k=>$v){
+					if(!in_array($k,Config::get('imager.exif_fields'))){
+						unset($raw_exif[$k]);
+					}
+				}
+				$controls->exif = $raw_exif;				
+			}
+			else{
+				$controls->exif = array('error'=>'exif data not supported');
+			}
+
 			$view->controls = $controls;
 		}
 		else{

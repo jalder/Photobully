@@ -35,4 +35,29 @@ class Model_Album extends \Orm\Model
 	    )
 	);
 	
+	public static function public_albums()
+	{
+		$albums = Model_Album::find('all');
+		$data = array();
+		$i = 0;
+		foreach($albums as $a){
+			$images = Model_Album_Image::find()->where('album_id',$a->id)->get();
+			foreach($images as $image){
+				$check = Model_Image::find($image->image_id);
+				if(!$check){
+					continue;
+				}
+				if($check->privacy == 0){
+					$i++;
+				}
+			}
+			if($i){
+				$data[] = $a;
+				$i = 0;
+			}
+		}
+		return $data;		
+		
+	}
+	
 }
